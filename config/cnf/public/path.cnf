@@ -1,0 +1,25 @@
+;mirror
+originurl                                   = http://test-stand24.kwork.ru
+
+;url
+baseurl                                     = http://test-stand24.kwork.ru
+pushserver                                  = test-stand24.kwork.ru
+purl                                        = http://test-stand24.kwork.ru/pics
+purl_mirror 				                = http://test-stand24.kwork.ru/pics
+purl_mirror 				                = https://kwork.ru/pics
+imageurl                                    = http://test-stand24.kwork.ru/images
+membersprofilepicurl                        = http://test-stand24.kwork.ru/files/avatar
+adminurl                                    = http://test-stand24.kwork.ru/administrator
+uploadedurl                                 = http://test-stand24.kwork.ru/files/uploaded
+portfoliourl                                = http://test-stand24.kwork.ru/files/portfolio
+coverurl                                    = http://test-stand24.kwork.ru/files/cover
+widgeturl                                   = http://test-stand24.kwork.ru/js/kwork_widget.js
+files_miniature_url							= http://test-stand24.kwork.ru/files/miniature
+
+;dir
+basedir                                     = /home/user24/www/test-stand24/public_html
+imagedir                                    = /home/user24/www/test-stand24/public_html/images
+pdir                                        = /home/user24/www/test-stand24/public_html/pics
+membersprofilepicdir                        = /home/user24/www/test-stand24/public_html/files/avatar
+logDir                                      = /home/user24/www/test-stand24/logs
+configdir                                   = /home/user24/www/test-stand24/config
