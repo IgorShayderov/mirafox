@@ -9,6 +9,8 @@
 	{Helper::printCssFile("/css/dist/manage_orders.css"|cdnBaseUrl)}
 
 	{strip}
+		<div id="orders-vue"></div>
+
 		<div class="centerwrap clearfix pt20 block-response">
 			<h1 class="f32 orders-title">{'Заказы'|t}</h1>
 			{if $orders|@count eq "0" && $searchQuery eq null}
@@ -36,29 +38,29 @@
 							<thead>
 								<tr>
 									<td class="w52p">
-										<a class="pl20 {if $a eq 'asc'}table-style_sort-up{else}table-style_sort-down{/if} {if $b == 'title'}active{/if}" 
-											href="#" data-params="s={$s}&b=title&a={if $a eq 'asc'}desc{else}asc{/if}" 
+										<a class="pl20 {if $a eq 'asc'}table-style_sort-up{else}table-style_sort-down{/if} {if $b == 'title'}active{/if}"
+											href="#" data-params="s={$s}&b=title&a={if $a eq 'asc'}desc{else}asc{/if}"
 											onclick="location.href = '?' + getUpdatedUrlParamsString(this.getAttribute('data-params'))">
 											{'Название'|t}
 										</a>
 									</td>
 									<td class="{if $s eq 'active'}w5p{else}w19p{/if}">
-										<a class="{if $a eq 'asc'}table-style_sort-up{else}table-style_sort-down{/if} {if $b == 'price'}active{/if}" 
-											href="#" data-params="s={$s}&b=price&a={if $a eq 'asc'}desc{else}asc{/if}" 
+										<a class="{if $a eq 'asc'}table-style_sort-up{else}table-style_sort-down{/if} {if $b == 'price'}active{/if}"
+											href="#" data-params="s={$s}&b=price&a={if $a eq 'asc'}desc{else}asc{/if}"
 											onclick="location.href = '?' + getUpdatedUrlParamsString(this.getAttribute('data-params'))">
 											{'Стоимость'|t}
 										</a>
 									</td>
 									<td class="{if $s eq 'active'}w5p{else}w19p{/if}">
-										<a class="{if $a eq 'asc'}table-style_sort-up{else}table-style_sort-down{/if} {if $b == 'user'}active{/if}" 
-											href="#" data-params="s={$s}&b=user&a={if $a eq 'asc'}desc{else}asc{/if}" 
+										<a class="{if $a eq 'asc'}table-style_sort-up{else}table-style_sort-down{/if} {if $b == 'user'}active{/if}"
+											href="#" data-params="s={$s}&b=user&a={if $a eq 'asc'}desc{else}asc{/if}"
 											onclick="location.href = '?' + getUpdatedUrlParamsString(this.getAttribute('data-params'))">
 											{'Покупатель'|t}
 										</a>
 									</td>
 									<td class="w19p">
-										<a class="{if $a eq 'asc'}table-style_sort-up{else}table-style_sort-down{/if} {if $b == 'date'}active{/if}" 
-											href="#" data-params="s={$s}&b=date&a={if $a eq 'asc'}desc{else}asc{/if}" 
+										<a class="{if $a eq 'asc'}table-style_sort-up{else}table-style_sort-down{/if} {if $b == 'date'}active{/if}"
+											href="#" data-params="s={$s}&b=date&a={if $a eq 'asc'}desc{else}asc{/if}"
 											onclick="location.href = '?' + getUpdatedUrlParamsString(this.getAttribute('data-params'))">
 											{if $s eq 'completed'}
 												{'Оплачено'|t}
@@ -71,16 +73,16 @@
 									</td>
 									{if $s eq 'active'}
 										<td class="w14p">
-											<a class="{if $a eq 'asc'}table-style_sort-up{else}table-style_sort-down{/if} {if $b == 'deadline'}active{/if}" 
-												href="#" data-params="s={$s}&b=deadline&a={if $a eq 'asc'}desc{else}asc{/if}" 
+											<a class="{if $a eq 'asc'}table-style_sort-up{else}table-style_sort-down{/if} {if $b == 'deadline'}active{/if}"
+												href="#" data-params="s={$s}&b=deadline&a={if $a eq 'asc'}desc{else}asc{/if}"
 												onclick="location.href = '?' + getUpdatedUrlParamsString(this.getAttribute('data-params'))">
 												{'Осталось'|t}
 											</a>
 										</td>
 									{/if}
 									<td class="w19p  ta-center">
-										<a class="{if $a eq 'asc'}table-style_sort-up{else}table-style_sort-down{/if} {if $b == 'status'}active{/if}" 
-											href="#" data-params="s={$s}&b=status&a={if $a eq 'asc'}desc{else}asc{/if}" 
+										<a class="{if $a eq 'asc'}table-style_sort-up{else}table-style_sort-down{/if} {if $b == 'status'}active{/if}"
+											href="#" data-params="s={$s}&b=status&a={if $a eq 'asc'}desc{else}asc{/if}"
 											onclick="location.href = '?' + getUpdatedUrlParamsString(this.getAttribute('data-params'))">
 											{'Статус'|t}
 										</a>
