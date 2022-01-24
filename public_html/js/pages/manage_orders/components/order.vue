@@ -2,55 +2,21 @@
   <li class="order">
     <div class="order__content">
       <div class="order__order-status" :class="[orderStatusClass]">
-        <svg
-          v-if="status === statuses.rejected"
-          class="order__fail"
-          width="8"
-          height="8"
-          viewBox="0 0 8 8"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M7 7L1 1" stroke-linecap="round" stroke-linejoin="round" />
-          <path d="M1 7L7 1" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
+        <FailIcon v-if="status === statuses.rejected" class="order__fail" />
 
-        <svg
+        <SuccessIcon
           v-if="status === statuses.accepted"
           class="order__success"
-          width="11"
-          height="8"
-          viewBox="0 0 16 8"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M8 7L14 1" stroke-linecap="round" stroke-linejoin="round" />
-          <path
-            d="M1 4L4 7L10 1"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
+        />
 
         {{ orderStatusTitle }}
       </div>
 
-      <div class="order__avatar-container">
-        <img
-          v-show="order.profilepicture && imageIsLoaded"
-          :src="order.profilepicute"
-          alt="Фото"
-          class="order__seller-avatar"
-          @load="imageIsLoaded = true"
-        />
-
-        <img
-          v-show="!order.profilepicture || !imageIsLoaded"
-          class="order__seller-avatar"
-          src="/images/default_avatar.png"
-          alt="Фото по умолчанию"
-        />
-      </div>
+      <Avatar
+        class="order__avatar-container"
+        :photo-src="order.profilepicture"
+        photo-class="order__seller-avatar"
+      />
 
       <div class="order__text">
         <h2 class="order__sub-header" :title="order.kwork_title">
@@ -88,12 +54,13 @@
 </template>
 
 <script>
-import _ from "lodash";
-
-import OrderInfo from "./order-info.vue";
+import OrderInfo from "./order-info";
+import Avatar from "./avatar";
+import FailIcon from "../icons/fail";
+import SuccessIcon from "../icons/success";
 
 export default {
-  components: { OrderInfo },
+  components: { OrderInfo, Avatar, FailIcon, SuccessIcon },
   provide() {
     return {
       notify: this.notify,
@@ -133,7 +100,9 @@ export default {
       };
     },
     emptyTrackHistory() {
-      return _.isEmpty(this.order.trackHistory);
+      const { trackHistory } = this.order;
+
+      return trackHistory && trackHistory.length === 0;
     },
     orderStatusClass() {
       const statusClasses = {
@@ -211,18 +180,20 @@ export default {
   z-index: 10;
 }
 
-.order__success,
-.order__fail {
-  bottom: 0;
-  position: absolute;
-  top: 0;
-  margin: auto 0;
-}
+::v-deep {
+  .order__success,
+  .order__fail {
+    bottom: 0;
+    position: absolute;
+    top: 0;
+    margin: auto 0;
+  }
 
-.order__success {
-  left: 6px;
-  stroke: var(--active-color);
-  width: 12px;
+  .order__success {
+    left: 6px;
+    stroke: var(--active-color);
+    width: 12px;
+  }
 }
 
 .order__fail {
@@ -259,7 +230,7 @@ export default {
 }
 
 .order__avatar-container,
-.order__seller-avatar,
+::v-deep .order__seller-avatar,
 .order__seller-initials {
   border-radius: 50%;
   height: var(--avatar-height);
@@ -274,7 +245,7 @@ export default {
   position: relative;
 }
 
-.order__seller-avatar {
+::v-deep .order__seller-avatar {
   margin: 12px 0 8px;
 }
 
