@@ -19,6 +19,6 @@ window.addEventListener('load', () => {
       }
     })
   });
-  console.log(orders, 'orders!')
+
   window.dataStorage = undefined;
 });

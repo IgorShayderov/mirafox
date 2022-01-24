@@ -35,7 +35,7 @@
       <p
         class="order-info__status"
         :class="{
-          'order-info__status_active': isInWork,
+          'order-info__status_active': isInWork || isChecking,
           'order-info__status_active-border': isChecking,
         }"
       >
@@ -54,8 +54,9 @@
           </p>
 
           <button
+            v-show="!isChecking"
             class="order-info__confirm-button mt10"
-            @click="notify('Отправить заказ')"
+            @click="showModal"
           >
             Отправить заказ
           </button>
@@ -119,14 +120,14 @@
 
         <button
           class="order-info__confirm-button mt20"
-          @click="notify('Опубликовать')"
+          @click="notify('Опубликован')"
         >
           Опубликовать
         </button>
 
         <button
           class="order-info__reject-button"
-          @click="notify('Оставить без публикации')"
+          @click="notify('Оставлен без публикации')"
         >
           Оставить без публикации
         </button>
@@ -159,6 +160,7 @@ export default {
 
       return message.description === description;
     },
+    showModal() {},
   },
   computed: {
     status() {
@@ -174,9 +176,7 @@ export default {
       return this.status === 5;
     },
     isInWork() {
-      const { in_work } = this.order;
-
-      return this.status === 1 && parseInt(in_work, 10) === 1;
+      return this.status >= 2 && !this.rejectedStatuses.includes(this.status);
     },
     isChecking() {
       return this.status >= 4 && !this.rejectedStatuses.includes(this.status);
@@ -189,9 +189,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@mixin pseudo-element-base {
+  content: "";
+  display: block;
+  position: absolute;
+}
+
 .order-info {
   display: grid;
-  grid-template-columns: 26% 74%;
+  grid-template-columns: 100px 1fr;
   padding-bottom: 42px;
 }
 
@@ -204,12 +210,12 @@ export default {
   padding: 0 20px 20px 8px;
   position: relative;
   margin-left: 1px;
+  width: 70px;
 
   &::before,
   &::after {
+    @include pseudo-element-base;
     background-color: transparent;
-    content: "";
-    position: absolute;
     left: -2px;
   }
 
@@ -288,6 +294,7 @@ export default {
   font-weight: 600;
   font-size: 0.875rem;
   line-height: 1.25rem;
+  position: relative;
 }
 
 .order-info__description-text {
@@ -316,5 +323,25 @@ export default {
   background-color: var(--sub-background-color);
   color: var(--active-color);
   border: 1px solid var(--active-color);
+}
+
+@media screen and (min-width: 1024px) {
+  .order-info {
+    grid-template-columns: 120px 1fr;
+  }
+
+  .order-info__description-title {
+    &::before {
+      @include pseudo-element-base;
+      background-color: var(--main-text-color);
+      bottom: 0;
+      height: 1.67px;
+      opacity: 0.4;
+      left: -24px;
+      top: 0;
+      margin: auto;
+      width: 16px;
+    }
+  }
 }
 </style>

@@ -81,12 +81,15 @@
       />
     </button>
 
-    <OrderInfo v-show="isExpanded" :order="order" />
+    <transition name="content-expand" mode="out-in">
+      <OrderInfo v-show="isExpanded" :order="order" />
+    </transition>
   </li>
 </template>
 
 <script>
 import _ from "lodash";
+import "animate.css";
 
 import OrderInfo from "./order-info.vue";
 
@@ -113,15 +116,6 @@ export default {
     emptyTrackHistory() {
       return _.isEmpty(this.order.trackHistory);
     },
-    getUserInitials() {
-      const [firstName, secondName] = this.order.username.split(" ");
-      const firstNameWord = firstName ? firstName.charAt(0).toUpperCase() : "";
-      const secondNameWord = secondName
-        ? ` ${firstName.charAt(0).toUpperCase()}`
-        : "";
-
-      return `${firstNameWord}${secondNameWord}`;
-    },
     orderStatusClass() {
       const statusClasses = {
         1: "order__order-status_not-started",
@@ -130,26 +124,22 @@ export default {
         4: "order__order-status_checking",
         5: "order__order-status_finished",
       };
-      const { status, in_work } = this.order;
+      const { status } = this.order;
 
       if (status) {
-        if (status === "1") {
-          const statusClassKey = in_work === "1" ? "2" : "1";
-
-          return statusClasses[statusClassKey];
-        }
-
         return statusClasses[status];
       }
 
       return "";
     },
     orderStatusTitle() {
-      const { status, in_work } = this.order;
+      const { status } = this.order;
 
       switch (status) {
         case "1":
-          return in_work === "1" ? "Взят в работу" : "Не начат";
+          return "Не начат";
+        case "2":
+          return "Взят в работу";
         case "3":
           return "Отменён";
         case "4":
@@ -346,7 +336,28 @@ export default {
 .order__expand-button_active {
   .order__expand-image {
     transform: rotate(180deg);
-    transition-duration: 0.3;
+    transition: all 0.6s ease-in-out;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .order {
+    border-radius: 8px;
+  }
+
+  .order__order-status {
+    border-radius: 20px 0 0 20px;
+    border: none;
+    top: 16px;
+  }
+
+  .order__content {
+    height: 128px;
+  }
+
+  .order__expand-button {
+    right: 32px;
+    bottom: 24px;
   }
 }
 </style>
