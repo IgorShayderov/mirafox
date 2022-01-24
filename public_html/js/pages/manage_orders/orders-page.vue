@@ -3,7 +3,7 @@
     <h1 class="orders-page__header">Заказы</h1>
 
     <ul class="orders-list">
-      <Order></Order>
+      <Order v-for="order in orders" :key="order.OID" :order="order" />
     </ul>
   </main>
 </template>
@@ -13,6 +13,12 @@ import Order from "./components/order";
 
 export default {
   components: { Order },
+  props: {
+    orders: {
+      type: Array,
+      default: () => [],
+    },
+  },
 };
 </script>
 
@@ -24,6 +30,9 @@ export default {
 
   --main-text-color: #000000;
   --light-text-color: #ffffff;
+  --inactive-text-color: #c0c0c0;
+  --info-bold-text-color: #111111;
+  --info-text-color: #333333;
 
   --main-btn-background: #689fd9;
   --sub-btn-background: #009900;

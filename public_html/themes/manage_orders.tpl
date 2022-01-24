@@ -9,9 +9,19 @@
 	{Helper::printCssFile("/css/dist/manage_orders.css"|cdnBaseUrl)}
 
 	{strip}
+		<script type="text/javascript">
+			const orders = {$orders|@json_encode nofilter};
+
+			if (!window.dataStorage) {
+				window.dataStorage = {};
+			}
+
+			window.dataStorage.orders = orders;
+		</script>
+
 		<div id="orders-vue"></div>
 
-		<div class="centerwrap clearfix pt20 block-response">
+		{* <div class="centerwrap clearfix pt20 block-response">
 			<h1 class="f32 orders-title">{'Заказы'|t}</h1>
 			{if $orders|@count eq "0" && $searchQuery eq null}
 				<div class="mt25 font-OpenSans t-align-c">
@@ -106,7 +116,7 @@
 				</div>
 			{/if}
 			<div class="clear"></div>
-		</div>
+		</div> *}
 	{/strip}
 
 	{include file="popup/order_change_name.tpl"}
