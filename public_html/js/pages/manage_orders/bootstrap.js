@@ -3,6 +3,10 @@ import OrdersPage from './orders-page';
 require('appJs/bootstrap.js');
 require('appJs/live-tabs.js');
 
+import { BModal } from "bootstrap-vue";
+
+Vue.component('b-modal', BModal);
+
 window.addEventListener('load', () => {
   const { dataStorage } = window;
   let orders = [];

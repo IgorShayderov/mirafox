@@ -3,7 +3,7 @@
     <div class="order__content">
       <div class="order__order-status" :class="[orderStatusClass]">
         <svg
-          v-if="order.status === '3'"
+          v-if="status === statuses.rejected"
           class="order__fail"
           width="8"
           height="8"
@@ -16,7 +16,7 @@
         </svg>
 
         <svg
-          v-if="order.status === '5'"
+          v-if="status === statuses.accepted"
           class="order__success"
           width="11"
           height="8"
@@ -89,7 +89,6 @@
 
 <script>
 import _ from "lodash";
-import "animate.css";
 
 import OrderInfo from "./order-info.vue";
 
@@ -98,12 +97,14 @@ export default {
   provide() {
     return {
       notify: this.notify,
+      status: this.status,
+      statuses: this.statuses,
     };
   },
   props: {
     order: {
       type: Object,
-      default: () => ({}),
+      required: true,
     },
   },
   data() {
@@ -113,6 +114,24 @@ export default {
     };
   },
   computed: {
+    status() {
+      if (this.order.status) {
+        const status = parseInt(this.order.status, 10);
+
+        return status;
+      }
+
+      return 0;
+    },
+    statuses() {
+      return {
+        notStarted: 1,
+        inWork: 2,
+        rejected: 3,
+        checking: 4,
+        accepted: 5,
+      };
+    },
     emptyTrackHistory() {
       return _.isEmpty(this.order.trackHistory);
     },
@@ -150,6 +169,11 @@ export default {
           return "";
       }
     },
+  },
+  mounted() {
+    const { inWork, checking } = this.statuses;
+
+    this.isExpanded = [inWork, checking].includes(this.status);
   },
   methods: {
     notify(message) {
@@ -246,12 +270,12 @@ export default {
 
 .order__avatar-container {
   display: inline-block;
-  padding: 0 16px 0 8px;
+  padding: 0 13px 0 8px;
   position: relative;
 }
 
 .order__seller-avatar {
-  margin: 12px 16px 0 8px;
+  margin: 12px 0 8px;
 }
 
 .order__seller-initials {
@@ -270,6 +294,7 @@ export default {
   display: inline-block;
   height: 100%;
   max-width: calc(100% - (var(--avatar-width) + 40px));
+  vertical-align: top;
   white-space: nowrap;
 }
 

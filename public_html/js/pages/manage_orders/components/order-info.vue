@@ -138,17 +138,35 @@
 
 <script>
 export default {
-  inject: ["notify"],
+  inject: ["notify", "status", "statuses"],
   props: {
     order: {
       type: Object,
       default: () => ({}),
     },
   },
-  data() {
-    return {
-      rejectedStatuses: [3],
-    };
+  computed: {
+    rejectedStatuses() {
+      return [this.statuses.rejected];
+    },
+    isAccepted() {
+      return this.status === this.statuses.accepted;
+    },
+    isChecking() {
+      const isCheckingOrFurther = this.status >= this.statuses.checking;
+
+      return (
+        isCheckingOrFurther && !this.rejectedStatuses.includes(this.status)
+      );
+    },
+    isInWork() {
+      const inWorkOrFurther = this.status >= this.statuses.inWork;
+
+      return inWorkOrFurther && !this.rejectedStatuses.includes(this.status);
+    },
+    isRejected() {
+      return this.rejectedStatuses.includes(this.status);
+    },
   },
   methods: {
     checkMessageExitance(description, messageIndex) {
@@ -160,29 +178,8 @@ export default {
 
       return message.description === description;
     },
-    showModal() {},
-  },
-  computed: {
-    status() {
-      if (this.order.status === undefined) {
-        return 0;
-      }
-
-      const status = parseInt(this.order.status, 10);
-
-      return status;
-    },
-    isAccepted() {
-      return this.status === 5;
-    },
-    isInWork() {
-      return this.status >= 2 && !this.rejectedStatuses.includes(this.status);
-    },
-    isChecking() {
-      return this.status >= 4 && !this.rejectedStatuses.includes(this.status);
-    },
-    isRejected() {
-      return this.rejectedStatuses.includes(this.status);
+    showModal() {
+      $(".js-inprogress-confirm").modal("show");
     },
   },
 };
@@ -276,7 +273,7 @@ export default {
   color: var(--error-color);
 
   &::before {
-    border-color: var(--error-color);
+    background-color: var(--error-color);
   }
 }
 
@@ -328,6 +325,10 @@ export default {
 @media screen and (min-width: 1024px) {
   .order-info {
     grid-template-columns: 120px 1fr;
+  }
+
+  .order-info__status {
+    min-height: 86px;
   }
 
   .order-info__description-title {
