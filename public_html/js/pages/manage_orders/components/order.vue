@@ -1,40 +1,201 @@
 <template>
   <li class="order">
-    <div class="order__order-status order__order-status_not-started">
-      Не начат
-    </div>
-
-    <div class="order__avatar-container">
-      <img class="order__seller-avatar" />
-
-      <span class="order__seller-initials">И.А.</span>
-    </div>
-
     <div class="order__content">
-      <h2 class="order__sub-header">Баннер для сайта</h2>
+      <div class="order__order-status" :class="[orderStatusClass]">
+        <svg
+          v-if="status === statuses.rejected"
+          class="order__fail"
+          width="8"
+          height="8"
+          viewBox="0 0 8 8"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M7 7L1 1" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M1 7L7 1" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
 
-      <p class="order__seller-status">Покупатель онлайн</p>
+        <svg
+          v-if="status === statuses.accepted"
+          class="order__success"
+          width="11"
+          height="8"
+          viewBox="0 0 16 8"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M8 7L14 1" stroke-linecap="round" stroke-linejoin="round" />
+          <path
+            d="M1 4L4 7L10 1"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
 
-      <button class="order__send-button">Отправить сообщение</button>
+        {{ orderStatusTitle }}
+      </div>
+
+      <div class="order__avatar-container">
+        <img
+          v-show="order.profilepicture && imageIsLoaded"
+          :src="order.profilepicute"
+          alt="Фото"
+          class="order__seller-avatar"
+          @load="imageIsLoaded = true"
+        />
+
+        <img
+          v-show="!order.profilepicture || !imageIsLoaded"
+          class="order__seller-avatar"
+          src="/images/default_avatar.png"
+          alt="Фото по умолчанию"
+        />
+      </div>
+
+      <div class="order__text">
+        <h2 class="order__sub-header" :title="order.kwork_title">
+          {{ order.kwork_title }}
+        </h2>
+
+        <p class="order__seller-status">Покупатель онлайн</p>
+
+        <button
+          class="order__send-button"
+          @click="notify('Сообщение отправлено')"
+        >
+          Отправить сообщение
+        </button>
+      </div>
     </div>
 
-    <button class="order__expand-button">
-      <img src="/images/curved-arrow.svg" alt="Изогнутая стрелка" />
+    <button
+      v-if="!emptyTrackHistory"
+      class="order__expand-button"
+      :class="[isExpanded && 'order__expand-button_active']"
+      @click="isExpanded = !isExpanded"
+    >
+      <img
+        class="order__expand-image"
+        src="/images/curved-arrow.svg"
+        alt="Изогнутая стрелка"
+      />
     </button>
+
+    <transition name="content-expand" mode="out-in">
+      <OrderInfo v-show="isExpanded" :order="order" />
+    </transition>
   </li>
 </template>
 
 <script>
-export default {};
+import _ from "lodash";
+
+import OrderInfo from "./order-info.vue";
+
+export default {
+  components: { OrderInfo },
+  provide() {
+    return {
+      notify: this.notify,
+      status: this.status,
+      statuses: this.statuses,
+    };
+  },
+  props: {
+    order: {
+      type: Object,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      isExpanded: false,
+      imageIsLoaded: false,
+    };
+  },
+  computed: {
+    status() {
+      if (this.order.status) {
+        const status = parseInt(this.order.status, 10);
+
+        return status;
+      }
+
+      return 0;
+    },
+    statuses() {
+      return {
+        notStarted: 1,
+        inWork: 2,
+        rejected: 3,
+        checking: 4,
+        accepted: 5,
+      };
+    },
+    emptyTrackHistory() {
+      return _.isEmpty(this.order.trackHistory);
+    },
+    orderStatusClass() {
+      const statusClasses = {
+        1: "order__order-status_not-started",
+        2: "order__order-status_in-work",
+        3: "order__order-status_canceling",
+        4: "order__order-status_checking",
+        5: "order__order-status_finished",
+      };
+      const { status } = this.order;
+
+      if (status) {
+        return statusClasses[status];
+      }
+
+      return "";
+    },
+    orderStatusTitle() {
+      const { status } = this.order;
+
+      switch (status) {
+        case "1":
+          return "Не начат";
+        case "2":
+          return "Взят в работу";
+        case "3":
+          return "Отменён";
+        case "4":
+          return "Сдан на проверку";
+        case "5":
+          return "Выполнен";
+        default:
+          return "";
+      }
+    },
+  },
+  mounted() {
+    const { inWork, checking } = this.statuses;
+
+    this.isExpanded = [inWork, checking].includes(this.status);
+  },
+  methods: {
+    notify(message) {
+      alert(message);
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
 .order {
+  --avatar-height: 72px;
+  --avatar-width: 72px;
+
   background-color: var(--sub-background-color);
-  height: 112px;
   position: relative;
   margin-bottom: 20px;
   width: 100%;
+}
+
+.order__content {
+  height: 112px;
 }
 
 .order__order-status {
@@ -50,14 +211,34 @@ export default {};
   z-index: 10;
 }
 
-.order__order-status_in-work {
-  background-color: var(--active-background-color);
-  color: var(--active-color);
+.order__success,
+.order__fail {
+  bottom: 0;
+  position: absolute;
+  top: 0;
+  margin: auto 0;
+}
+
+.order__success {
+  left: 6px;
+  stroke: var(--active-color);
+  width: 12px;
+}
+
+.order__fail {
+  left: 8px;
+  stroke: var(--error-color);
+  width: 6px;
 }
 
 .order__order-status_not-started {
   background-color: var(--passive-background-color);
   color: var(--passive-color);
+}
+
+.order__order-status_in-work {
+  background-color: var(--active-background-color);
+  color: var(--active-color);
 }
 
 .order__order-status_checking {
@@ -68,31 +249,53 @@ export default {};
 .order__order-status_canceling {
   background-color: var(--error-background-color);
   color: var(--error-color);
+  padding-left: 19px;
+}
+
+.order__order-status_finished {
+  background-color: var(--active-background-color);
+  color: var(--active-color);
+  padding-left: 22px;
+}
+
+.order__avatar-container,
+.order__seller-avatar,
+.order__seller-initials {
+  border-radius: 50%;
+  height: var(--avatar-height);
+  width: var(--avatar-width);
+  max-height: var(--avatar-height);
+  max-width: var(--avatar-width);
 }
 
 .order__avatar-container {
   display: inline-block;
+  padding: 0 13px 0 8px;
   position: relative;
 }
 
 .order__seller-avatar {
-  border-radius: 50%;
-  height: 72px;
-  margin: 12px 16px 0 8px;
-  width: 72px;
+  margin: 12px 0 8px;
 }
 
 .order__seller-initials {
+  background-color: var(--main-background-color);
   position: absolute;
   margin: auto;
   left: 50%;
+  line-height: var(--avatar-height);
   top: 50%;
   transform: translate(-50%, -50%);
+  text-align: center;
+  vertical-align: middle;
 }
 
-.order__content {
+.order__text {
   display: inline-block;
   height: 100%;
+  max-width: calc(100% - (var(--avatar-width) + 40px));
+  vertical-align: top;
+  white-space: nowrap;
 }
 
 .order__sub-header {
@@ -156,6 +359,30 @@ export default {};
 }
 
 .order__expand-button_active {
-  transform: rotate(180deg);
+  .order__expand-image {
+    transform: rotate(180deg);
+    transition: all 0.6s ease-in-out;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .order {
+    border-radius: 8px;
+  }
+
+  .order__order-status {
+    border-radius: 20px 0 0 20px;
+    border: none;
+    top: 16px;
+  }
+
+  .order__content {
+    height: 128px;
+  }
+
+  .order__expand-button {
+    right: 32px;
+    bottom: 24px;
+  }
 }
 </style>
